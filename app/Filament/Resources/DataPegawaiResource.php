@@ -30,7 +30,7 @@ class DataPegawaiResource extends Resource
 {
     protected static ?string $model = DataPegawai::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     public static function form(Form $form): Form
     {
@@ -116,11 +116,64 @@ class DataPegawaiResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                //
-            ])
+                Filter::make('nama')
+                    ->query(
+                        fn(Builder $query, array $data): Builder => $query
+                            ->when(
+                                $data['nama'],
+                                fn(Builder $query, $nama): Builder => $query->where('nama', 'like', "%{$nama}%")
+                            )
+                    )
+                    ->form([
+                        TextInput::make('nama')->label('Nama'),
+                    ]),
+                Filter::make('tanggal')
+                    ->query(
+                        fn(Builder $query, array $data): Builder => $query
+                            ->when(
+                                $data['tanggal_awal'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('tanggal_lahir', '>=', $date),
+                            )
+                            ->when(
+                                $data['tanggal_akhir'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('tanggal_lahir', '<=', $date),
+                            )
+                    )
+                    ->form([
+                        DatePicker::make('tanggal_awal')
+                            ->label('Tanggal Awal')
+                            ->columnSpan(2),
+                        DatePicker::make('tanggal_akhir')
+                            ->label('Tanggal Akhir')
+                            ->columnSpan(2),
+                    ])->columnSpan(1),
+                Filter::make('status')
+                    ->query(
+                        fn(Builder $query, array $data): Builder => $query
+                            ->when(
+                                $data['status'],
+                                fn(Builder $query, $status): Builder => $query->where('status', $status)
+                            )
+                    )
+                    ->form([
+                        Select::make('status')
+                            ->options([
+                                'Polri' => 'Polri',
+                                'PNS' => 'PNS',
+                                'P3K' => 'P3K',
+                                'PPNPN' => 'PPNPN',
+                            ])
+                            ->label('Status')
+                            ->columnspan(2),
+                    ])->columnSpan(1),
+            ], layout: FiltersLayout::AboveContent)
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()
+                ->icon('heroicon-o-pencil-square')
+                ->label(''),
+                Tables\Actions\DeleteAction::make()
+                ->icon('heroicon-o-trash')
+                ->label(''),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
