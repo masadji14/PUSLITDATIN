@@ -26,7 +26,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            // ->login()
+            ->login()
             ->colors([
                 'primary' => Color::Amber,
                 'danger' => Color::Rose,
@@ -36,6 +36,7 @@ class AdminPanelProvider extends PanelProvider
                 'success' => Color::Emerald,
                 'warning' => Color::Orange,
             ])
+            ->font('Roboto')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -60,8 +61,11 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->brandLogo(asset('images/Logo_BNN.png'))
+            // ->brandLogo(asset('images/Logo_BNN.png'))
             ->brandName('Pusat Penelitian Data dan Informasi')
-            ->databaseNotifications();
+            ->databaseNotifications()
+            ->sidebarCollapsibleOnDesktop()
+            // ->sidebarWidth('15rem')
+            ;
     }
 }

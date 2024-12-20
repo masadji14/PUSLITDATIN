@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class DataProses extends Model
@@ -10,6 +11,6 @@ class DataProses extends Model
 
     public function DataPegawai()
     {
-        return $this->belongsTo(DataPegawai::class);
+        return $this->belongsTo(DataPegawai::class, 'data_pegawai_id');
     }
 }

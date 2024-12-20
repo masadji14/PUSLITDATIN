@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('data_proses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('data_pegawai_id')->constrained('data_pegawais')->cascadeOnDelete();
-            $table->date('tanggal_CPNS');
-            $table->date('tanggal_PNS');
+            $table->unsignedBigInteger('data_pegawai_id');
+            $table->foreign('data_pegawai_id')->references('id')->on('data_pegawais')->onDelete('cascade');
+            $table->date('tanggal_CPNS')->nullable();
+            $table->date('tanggal_PNS')->nullable();
             $table->date('pensiun');
             $table->date('KGB');
             $table->date('KP');
-            $table->date('tanggal_ulangtahun');
+            $table->date('tanggal_lahir');
             $table->timestamps();
         });
     }

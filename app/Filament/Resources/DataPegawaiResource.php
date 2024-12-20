@@ -30,7 +30,7 @@ class DataPegawaiResource extends Resource
 {
     protected static ?string $model = DataPegawai::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
 
     public static function form(Form $form): Form
     {
@@ -60,9 +60,13 @@ class DataPegawaiResource extends Resource
                 TextInput::make('email')
                     ->required(),
                 DatePicker::make('tmt_cpns')
-                    ->required(),
+                    ->label('Tanggal CPNS')
+                    ->requiredWithout('tmt_pns')
+                    ->hint('Isi tanggal CPNS jika tidak mengisi tanggal PNS.'),
                 DatePicker::make('tmt_pns')
-                    ->required(),
+                    ->label('Tanggal PNS')
+                    ->requiredWithout('tmt_cpns')
+                    ->hint('Isi tanggal PNS jika tidak mengisi tanggal CPNS.'),
                 Select::make('status')
                     ->options([
                         'polri' => 'POLRI',
@@ -127,26 +131,26 @@ class DataPegawaiResource extends Resource
                     ->form([
                         TextInput::make('nama')->label('Nama'),
                     ]),
-                Filter::make('tanggal')
-                    ->query(
-                        fn(Builder $query, array $data): Builder => $query
-                            ->when(
-                                $data['tanggal_awal'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('tanggal_lahir', '>=', $date),
-                            )
-                            ->when(
-                                $data['tanggal_akhir'],
-                                fn(Builder $query, $date): Builder => $query->whereDate('tanggal_lahir', '<=', $date),
-                            )
-                    )
-                    ->form([
-                        DatePicker::make('tanggal_awal')
-                            ->label('Tanggal Awal')
-                            ->columnSpan(2),
-                        DatePicker::make('tanggal_akhir')
-                            ->label('Tanggal Akhir')
-                            ->columnSpan(2),
-                    ])->columnSpan(1),
+                // Filter::make('tanggal')
+                //     ->query(
+                //         fn(Builder $query, array $data): Builder => $query
+                //             ->when(
+                //                 $data['tanggal_awal'],
+                //                 fn(Builder $query, $date): Builder => $query->whereDate('tanggal_lahir', '>=', $date),
+                //             )
+                //             ->when(
+                //                 $data['tanggal_akhir'],
+                //                 fn(Builder $query, $date): Builder => $query->whereDate('tanggal_lahir', '<=', $date),
+                //             )
+                //     )
+                //     ->form([
+                //         DatePicker::make('tanggal_awal')
+                //             ->label('Tanggal Awal')
+                //             ->columnSpan(2),
+                //         DatePicker::make('tanggal_akhir')
+                //             ->label('Tanggal Akhir')
+                //             ->columnSpan(2),
+                //     ])->columnSpan(1),
                 Filter::make('status')
                     ->query(
                         fn(Builder $query, array $data): Builder => $query
@@ -169,11 +173,11 @@ class DataPegawaiResource extends Resource
             ], layout: FiltersLayout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make()
-                ->icon('heroicon-o-pencil-square')
-                ->label(''),
+                    ->icon('heroicon-o-pencil-square')
+                    ->label(''),
                 Tables\Actions\DeleteAction::make()
-                ->icon('heroicon-o-trash')
-                ->label(''),
+                    ->icon('heroicon-o-trash')
+                    ->label(''),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -189,7 +193,7 @@ class DataPegawaiResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\DataProsesRelationManager::class,
         ];
     }
 
