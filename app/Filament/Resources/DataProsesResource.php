@@ -11,7 +11,10 @@ use Filament\Tables\Table;
 use App\Models\DataPegawai;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
+use Filament\Tables\Actions\ExportAction;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Exports\DataProsesExporter;
+use Filament\Tables\Actions\ExportBulkAction;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\DataProsesResource\Pages;
 use App\Filament\Resources\DataProsesResource\RelationManagers;
@@ -98,8 +101,21 @@ class DataProsesResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    ExportBulkAction::make()->exporter(DataProsesExporter::class),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                ExportAction::make('Export ke Excel')
+                    ->exporter(DataProsesExporter::class)
+                    ->label('Excel')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success'),
+                    ExportAction::make('Export ke PDF')
+                    ->exporter(DataProsesExporter::class)
+                    ->label('PDF')
+                    ->icon('heroicon-o-document-text')
+                    ->color('danger'),
             ]);
     }
 

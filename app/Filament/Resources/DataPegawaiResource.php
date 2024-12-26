@@ -7,24 +7,24 @@ use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\DataPegawai;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Resources\Resource;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
-use Illuminate\Validation\Rules\Enum;
+use Illuminate\Support\Facades\Blade;
 use Filament\Support\Enums\FontFamily;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\TextColumn;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Enums\FiltersLayout;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Actions\ExportAction;
-use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\DataPegawaiExporter;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\ExportBulkAction;
 use App\Filament\Resources\DataPegawaiResource\Pages;
 use App\Filament\Resources\DataPegawaiResource\RelationManagers;
-use Filament\Tables\Actions\ExportBulkAction;
 
 class DataPegawaiResource extends Resource
 {
@@ -186,7 +186,44 @@ class DataPegawaiResource extends Resource
                 ]),
             ])
             ->headerActions([
-                ExportAction::make()->exporter(DataPegawaiExporter::class),
+                ExportAction::make('Export ke Excel')
+                    ->exporter(DataPegawaiExporter::class)
+                    ->label('Excel')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success'),
+                Tables\Actions\Action::make('Export ke PDF')
+                    ->label('PDF')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('danger')
+                    ->form([
+                        Select::make('columns')
+                            ->multiple()
+                            ->options([
+                                'nip' => 'NIP',
+                                'nama' => 'Nama',
+                                'golongan_jabatan' => 'Golongan Jabatan',
+                                'pendidikan' => 'Pendidikan',
+                                'tmt_cpns' => 'Tanggal CPNS',
+                                'tmt_pns' => 'Tanggal PNS',
+                                'status' => 'Status',
+                                'pangkat' => 'Pangkat',
+                            ])
+                            ->required()
+                            ->label('Pilih Kolom'),
+                    ])
+                    ->action(function (array $data) {
+                        $columns = $data['columns']; // Kolom yang dipilih
+                        $dataPegawai = \App\Models\DataPegawai::select($columns)->get(); // Hanya kolom terpilih
+
+                        $pdfContent = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.data_pegawai_pdf', [
+                            'records' => $dataPegawai,
+                            'columns' => $columns,
+                        ])->output(); // Render view menjadi PDF
+
+                        return response()->streamDownload(function () use ($pdfContent) {
+                            echo $pdfContent;
+                        }, 'data_pegawai.pdf'); // Unduh file dengan nama "data_pegawai.pdf"
+                    }),
             ]);
     }
 

@@ -3,13 +3,15 @@
 namespace App\Filament\Exports;
 
 use App\Models\DataPegawai;
-use Filament\Actions\Exports\ExportColumn;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions\Exports\Exporter;
+use Illuminate\Support\Facades\Storage;
+use OpenSpout\Common\Entity\Style\Color;
+use OpenSpout\Common\Entity\Style\Style;
+use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Models\Export;
 use OpenSpout\Common\Entity\Style\CellAlignment;
 use OpenSpout\Common\Entity\Style\CellVerticalAlignment;
-use OpenSpout\Common\Entity\Style\Color;
-use OpenSpout\Common\Entity\Style\Style;
 
 class DataPegawaiExporter extends Exporter
 {
@@ -35,8 +37,6 @@ class DataPegawaiExporter extends Exporter
             ExportColumn::make('pangkat'),
             ExportColumn::make('golongan_jabatan'),
             ExportColumn::make('jenis_kelamin'),
-            ExportColumn::make('created_at'),
-            ExportColumn::make('updated_at'),
         ];
     }
 
@@ -50,17 +50,33 @@ class DataPegawaiExporter extends Exporter
 
         return $body;
     }
+    public function exportToPdf(array $data): string
+    {
+        // Pastikan data diisi
+        if (empty($data)) {
+            throw new \Exception('Data untuk ekspor kosong.');
+        }
+        // Nama file PDF
+        $filePath = 'exports/data_pegawai.pdf';
+
+        // Simpan data ke file PDF
+        PDF::loadView('exports.data_pegawai', ['data' => $data])
+            ->setPaper('a4', 'landscape') // Atur ukuran kertas
+            ->save(storage_path('app/' . $filePath)); // Simpan ke storage
+
+        return $filePath;
+    }
 
     public function getXlsxHeaderCellStyle(): ?Style
-{
-    return (new Style())
-        ->setFontBold()
-        ->setFontItalic()
-        ->setFontSize(14)
-        ->setFontName('Consolas')
-        ->setFontColor(Color::BLACK)
-        ->setBackgroundColor(Color::BLUE)
-        ->setCellAlignment(CellAlignment::CENTER)
-        ->setCellVerticalAlignment(CellVerticalAlignment::CENTER);
-}
+    {
+        return (new Style())
+            ->setFontBold()
+            ->setFontItalic()
+            ->setFontSize(14)
+            ->setFontName('Consolas')
+            ->setFontColor(Color::BLACK)
+            ->setBackgroundColor(Color::BLUE)
+            ->setCellAlignment(CellAlignment::CENTER)
+            ->setCellVerticalAlignment(CellVerticalAlignment::CENTER);
+    }
 }
