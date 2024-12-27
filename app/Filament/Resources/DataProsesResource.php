@@ -65,11 +65,11 @@ class DataProsesResource extends Resource
                 Tables\Columns\TextColumn::make('tanggal_CPNS')
                     ->date()
                     ->sortable()
-                    ->hidden(fn ($record) => $record?->tmt_pns !== null),
+                    ->hidden(fn($record) => $record?->tmt_pns !== null),
                 Tables\Columns\TextColumn::make('tanggal_PNS')
                     ->date()
                     ->sortable()
-                    ->hidden(fn ($record) => $record?->tmt_cpns !== null),
+                    ->hidden(fn($record) => $record?->tmt_cpns !== null),
                 Tables\Columns\TextColumn::make('pensiun')
                     ->date()
                     ->sortable(),
@@ -109,12 +109,12 @@ class DataProsesResource extends Resource
                 ExportAction::make('Export ke Excel')
                     ->exporter(DataProsesExporter::class)
                     ->label('Excel')
-                    ->icon('heroicon-o-arrow-down-tray')
+                    ->icon('heroicon-o-archive-box-arrow-down')
                     ->color('success'),
-                    ExportAction::make('Export ke PDF')
+                ExportAction::make('Export ke PDF')
                     ->exporter(DataProsesExporter::class)
                     ->label('PDF')
-                    ->icon('heroicon-o-document-text')
+                    ->icon('heroicon-o-archive-box-arrow-down')
                     ->color('danger'),
             ]);
     }
@@ -138,19 +138,19 @@ class DataProsesResource extends Resource
     private static function updateFormFields($state, callable $set)
     {
         $pegawai = \App\Models\DataPegawai::find($state);
-    
+
         if ($pegawai) {
             // Set data pegawai
             $set('tanggal_lahir', $pegawai->tanggal_lahir);
             $set('tanggal_CPNS', $pegawai->tmt_cpns);
             $set('tanggal_PNS', $pegawai->tmt_pns);
-            
+
             // Hitung tanggal pensiun
             $tanggal_lahir = $pegawai->tanggal_lahir ? Carbon::parse($pegawai->tanggal_lahir) : null;
             $usia_pensiun = 58;
             $tanggal_pensiun = $tanggal_lahir ? $tanggal_lahir->copy()->addYears($usia_pensiun) : null;
             $set('pensiun', $tanggal_pensiun?->format('Y-m-d'));
-    
+
             // Hitung KGB
             if ($pegawai->tmt_cpns) {
                 $tanggal_cpns = Carbon::parse($pegawai->tmt_cpns);
@@ -159,7 +159,7 @@ class DataProsesResource extends Resource
             } else {
                 $set('KGB', null);
             }
-    
+
             // Hitung KP
             if ($pegawai->tmt_pns) {
                 $tanggal_pns = Carbon::parse($pegawai->tmt_pns);
@@ -177,5 +177,5 @@ class DataProsesResource extends Resource
             $set('KGB', null);
             $set('KP', null);
         }
-    }    
+    }
 }

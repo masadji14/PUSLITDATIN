@@ -21,10 +21,13 @@ use Filament\Tables\Enums\FiltersLayout;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Actions\ExportAction;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Imports\DataProsesImporter;
 use App\Filament\Exports\DataPegawaiExporter;
+use App\Filament\Imports\DataPegawaiImporter;
 use Filament\Tables\Actions\ExportBulkAction;
 use App\Filament\Resources\DataPegawaiResource\Pages;
 use App\Filament\Resources\DataPegawaiResource\RelationManagers;
+use Filament\Tables\Actions\ImportAction;
 
 class DataPegawaiResource extends Resource
 {
@@ -189,11 +192,11 @@ class DataPegawaiResource extends Resource
                 ExportAction::make('Export ke Excel')
                     ->exporter(DataPegawaiExporter::class)
                     ->label('Excel')
-                    ->icon('heroicon-o-arrow-down-tray')
+                    ->icon('heroicon-o-archive-box-arrow-down')
                     ->color('success'),
                 Tables\Actions\Action::make('Export ke PDF')
                     ->label('PDF')
-                    ->icon('heroicon-o-arrow-down-tray')
+                    ->icon('heroicon-o-archive-box-arrow-down')
                     ->color('danger')
                     ->form([
                         Select::make('columns')

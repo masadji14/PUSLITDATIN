@@ -55,8 +55,7 @@ class DataProsesExporter extends Exporter
         });
 
         // $pdf = Pdf::loadView('exports.data_proses_pdf', ['data' => $data]);
-        $pdf = app('pdf');
-        $pdf = $pdf->loadView('exports.data_proses_pdf', ['data' => $data]);
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.data_proses_pdf', ['data' => $data]);
 
         return $pdf->download('data_proses.pdf');
     }
